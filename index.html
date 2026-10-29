@@ -2541,6 +2541,22 @@ tbody tr:nth-child(even){background:var(--zebra)}
 .fx-nm li .nm2::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0}
 .fx-nm li span.v{font-size:14.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
 .fx-nm li span.v.z{color:var(--ink4);font-weight:500}
+.fx-ns{background:var(--surf);border:1px solid var(--bd);border-left:4px solid var(--warn);border-radius:14px;padding:18px 22px 20px;margin-bottom:18px;box-shadow:var(--sh)}
+.fx-ns .nh{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:14px}
+.fx-ns .nt{display:flex;gap:12px;align-items:flex-start;min-width:0;flex:1 1 420px}
+.fx-ns .ni{width:30px;height:30px;border-radius:50%;background:var(--warnbg);color:var(--warn);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0}
+.fx-ns h4{font-size:14px;color:var(--ink);margin:0 0 3px;font-weight:700}
+.fx-ns p{font-size:12.5px;color:var(--ink3);margin:0;line-height:1.5}
+.fx-ns .nsum{text-align:right;background:var(--warnbg);border-radius:10px;padding:8px 14px;flex-shrink:0}
+.fx-ns .nsum small{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);font-weight:600}
+.fx-ns .nsum b{font-size:18px;color:var(--warn);font-variant-numeric:tabular-nums}
+.fx-ns ul{list-style:none;display:block;margin:0;padding:0;border-top:1px solid var(--bd)}
+.fx-ns li.lh{display:flex;justify-content:space-between;padding:8px 4px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink4);font-weight:600;border-bottom:1px solid var(--bd)}
+.fx-ns li:not(.lh){display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 4px;border-bottom:1px solid var(--bd)}
+.fx-ns li:not(.lh):last-child{border-bottom:0}
+.fx-ns li .nm2{display:flex;align-items:center;gap:12px;font-size:13.5px;font-weight:600;color:var(--ink);min-width:0}
+.fx-ns li .nm2::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0}
+.fx-ns li span.v{font-size:14.5px;font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums;white-space:nowrap}
 .fx-note{font-size:11.5px;color:var(--ink3);margin-top:10px;line-height:1.5}
 .fx-empty{padding:40px;text-align:center;color:var(--ink3)}
 </style>
@@ -2592,6 +2608,7 @@ tbody tr:nth-child(even){background:var(--zebra)}
     <div class="fx-chart"><canvas id="fx-ch"></canvas></div><div class="fx-tot" id="fx-tot"></div>
   </div>
   <div id="fx-nmw"></div>
+  <div id="fx-notstarted"></div>
   <div class="fx-card">
     <div class="fx-hd">
       <div><h3>Matriz por iniciativa x mês</h3><p id="fx-mxsub"></p></div>
@@ -6993,6 +7010,12 @@ function render(){
   var nmLab=(S.yr&&S.yr!=='all'?'Estimado em '+S.yr:'Estimado no período');
   $('fx-nmw').innerHTML=nmAll.length?'<div class="fx-nm"><div class="nh"><div class="nt"><div class="ni">!</div><div><h4>'+nmAll.length+' iniciativa'+(nmAll.length===1?'':'s')+' aprovada'+(nmAll.length===1?'':'s')+' em MC '+(nmAll.length===1?'sem valor':'sem valores')+' no Financeiro</h4><p>Estão no fluxo A&amp;M, mas sem valores na aba do Financeiro: ou a medição ainda não começou, ou a iniciativa está <b>bloqueada</b> (negociação desfeita). Na matriz aparecem hachuradas e entram na diferença com Financeiro = 0.</p></div></div><div class="nsum"><small>Total sem medição</small><b>'+fm(nmTot)+'</b></div></div><ul><li class="lh"><span>Iniciativa</span><span>'+nmLab+'</span></li>'+
     nmRows.map(function(r){var i=r.i;return '<li><div class="nm2">'+esc(i.n)+' <span class="fx-b '+frc(i.f)+'">'+esc(i.f)+'</span>'+stBadge(i)+'</div><span class="v'+(r.s?'':' z')+'">'+(r.s?fm(r.s):'—')+'</span></li>';}).join('')+'</ul></div>':'';
+  // approved initiatives whose capture hasn't started yet, based on the real current month
+  var _nd=new Date();
+  var nsToday=_nd.getFullYear()+'-'+('0'+(_nd.getMonth()+1)).slice(-2);
+  var nsAll=FX.inis.filter(function(i){return i.blk==='aprovada';}).map(function(i){var ks=Object.keys(i.am).sort();return {i:i,start:ks[0]};}).filter(function(r){return r.start&&r.start>nsToday;}).sort(function(a,b){return a.start<b.start?-1:(a.start>b.start?1:0);});
+  $('fx-notstarted').innerHTML=nsAll.length?'<div class="fx-ns"><div class="nh"><div class="nt"><div class="ni">⏳</div><div><h4>'+nsAll.length+' iniciativa'+(nsAll.length===1?'':'s')+' aprovada'+(nsAll.length===1?'':'s')+' em MC ainda sem início de captura</h4><p>Já estão aprovadas, mas o mês programado pra começar a captura no fluxo A&amp;M ainda não chegou (hoje: '+ml(nsToday)+'). A lista se atualiza sozinha assim que o mês virar.</p></div></div><div class="nsum"><small>Próxima a iniciar</small><b>'+ml(nsAll[0].start)+'</b></div></div><ul><li class="lh"><span>Iniciativa</span><span>Início previsto</span></li>'+
+    nsAll.map(function(r){var i=r.i;return '<li><div class="nm2">'+esc(i.n)+' <span class="fx-b '+frc(i.f)+'">'+esc(i.f)+'</span>'+stBadge(i)+'</div><span class="v">'+ml(r.start)+'</span></li>';}).join('')+'</ul></div>':'';
   renderMx(M,L);
 }
 function renderMx(M,L){
