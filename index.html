@@ -6911,7 +6911,7 @@ var MN=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 var CONF=FX.confirmed_until;
 var S={fin:false,fr:'all',ini:'all',yr:'2026',mo:'all',pf:'all',sc:'aprovada',view:'dif'};
 var OPEN={MMH:true,Indiretos:true,OPME:true};
-var OBS={}, DB=null, CANW=false, chart=null, saveT={};
+var OBS={"Negociacao-KCI": ""}, DB=null, CANW=false, chart=null, saveT={};
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function ml(m){var p=m.split('-');return MN[+p[1]-1]+'/'+p[0].slice(2);}
